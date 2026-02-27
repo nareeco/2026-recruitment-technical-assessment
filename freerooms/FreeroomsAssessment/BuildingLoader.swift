@@ -23,6 +23,30 @@ public class BuildingLoader {
     }
     
     public func fetchBuildings() async -> Result  {
-        fatalError("TODO")
+        let result = await client.get(from: url)
+        switch result {
+        case .failure:
+            return .failure(Error.connectivity)
+        case let .success ((data, response)):
+            guard response.statusCode == 200 else {
+                return .failure(Error.invalidData)
+            }
+            do {
+                let remoteBuildings = try JSONDecoder().decode([RemoteBuilding].self, from: data)
+                let buildings = remoteBuildings.map {
+                    Building(
+                        name: $0.building_name,
+                        id: $0.building_id.uuidString,
+                        latitude: $0.building_latitude,
+                        longitude: $0.building_longitude,
+                        aliases: $0.building_aliases
+                    )
+                }
+                return .success(buildings)
+            } catch {
+                return .failure(Error.invalidData)
+            }
+        }
     }
 }
+
