@@ -46,7 +46,26 @@ app.post("/parse", (req:Request, res:Response) => {
 // Takes in a recipeName and returns it in a form that 
 const parse_handwriting = (recipeName: string): string | null => {
   // TODO: implement me
-  return recipeName
+
+  if (!recipeName || recipeName.length === 0 ) {
+    return null;
+  }
+  const filtered = recipeName
+    .replace(/[-_]/g, " ")
+    .replace(/[^a-zA-Z ]/g, "")
+    .trim()
+    .replace(/\s+/g, " ");
+
+  if (filtered.length === 0) {
+    return null;
+  }
+
+  const final = filtered
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+
+  return final
 }
 
 // [TASK 2] ====================================================================
@@ -54,7 +73,7 @@ const parse_handwriting = (recipeName: string): string | null => {
 app.post("/entry", (req:Request, res:Response) => {
   // TODO: implement me
   res.status(500).send("not yet implemented!")
-
+  
 });
 
 // [TASK 3] ====================================================================
